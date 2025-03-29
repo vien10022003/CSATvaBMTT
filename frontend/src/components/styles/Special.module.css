@@ -18,6 +18,10 @@ body {
   border-radius: 2rem;
 }
 
+#div th, #div td {
+  padding: 10px;
+}
+
 #h1 {
   font-weight: bold;
 }
@@ -25,3 +29,4 @@ body {
 #p {
   font-weight: bold;
 }
+

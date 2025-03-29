@@ -7,7 +7,7 @@
 1. **Clone kho lưu trữ**: Sao chép kho lưu trữ này về máy của bạn:
 
    ```sh
-   git clone https://github.com/mushfiqurniazzz/Login-System---Node--MySQL--React
+   git clone https://github.com/vien10022003/CSATvaBMTT
    ```
 
 2. **Di chuyển vào thư mục dự án**: Điều hướng vào thư mục dự án, thực hiện bước 3 cho cả frontend và backend:

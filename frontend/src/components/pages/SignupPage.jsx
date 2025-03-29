@@ -1,127 +1,115 @@
-//importing necessarry libraries for signup function
-import { useState, useEffect } from "react"; //use state for state variables
-import axios from "axios"; //axios for communication with backend
-import { toast } from "sonner"; //sonner for toast notification
-import styles from "../styles/Signup.module.css"; //module css import
-import { Link, useHistory } from "react-router-dom"; //funcions from library
+// Import necessary libraries for signup function
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "sonner";
+import styles from "../styles/Signup.module.css";
+import { Link, useHistory } from "react-router-dom";
 
-//creation of the sign up component function
 function SignupPage() {
-  //state variables declaration using useState
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useHistory(); //for dinamically changing the path
+  const [gender, setGender] = useState("");
+  const [birth_date, setBirth_date] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone_number, setPhone_number] = useState("");
+  const [citizen_id, setCitizen_id] = useState("");
+  const history = useHistory();
 
   useEffect(() => {
-    document.title = "Login System - SignUp Page"; //dinamically changes the tittle
-  });
+    document.title = "Login System - SignUp Page";
+  }, []);
 
-  //axios post function which will first check for valid input, send a post request and then use sonner to render a toast notification
   const handleSignup = async (e) => {
-    e.preventDefault(); //disables the reload on submission
-    try {
-      //check if user has filled all required fields
-      if (
-        !username ||
-        username === "" ||
-        !email ||
-        email === "" ||
-        !password ||
-        password === ""
-      ) {
-        //incase all fields are not filled warn the user
-        toast.warning("All Fields are Required");
-        return; //return if the the case matches
-      }
+    e.preventDefault();
+    
+    if (!username || !email || !password || !gender || !birth_date || !address || !phone_number || !citizen_id) {
+      toast.warning("All fields are required");
+      return;
+    }
 
-      //if user has filled all necessary fields send axios post request
+    try {
       const res = await axios.post("http://localhost:3000/auth/signup", {
-        username: username,
-        email: email,
-        password: password
+        username,
+        email,
+        password,
+        gender,
+        birth_date,
+        address,
+        phone_number,
+        citizen_id
       });
 
-      //on successful account creation
       if (res.status === 201) {
-        setUsername(""); //empty the field after successful signup
-        setEmail(""); //empty the field after successful signup
-        setPassword(""); //empty the field after successful signup
-        //notify the client that the user has been created
-        toast.success("User Created Sucessfully, Redirecting...");
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setGender("");
+        setBirth_date("");
+        setAddress("");
+        setPhone_number("");
+        setCitizen_id("");
+        toast.success("User Created Successfully, Redirecting...");
       }
 
       setTimeout(() => {
         history.push("/login");
       }, 3000);
     } catch (error) {
-      //incase of error
       console.error("Error Creating User: ", error);
       toast.error("Error Creating User");
     }
   };
 
-  //bootstrap components
   return (
-    <>
-      <div className={"card"} id={styles.card}>
-        <div className={"card-body"}>
-          <h2 id={styles.h2}>SignUp</h2>
-          <hr />
-          <form onSubmit={handleSignup}>
-            {/* for Username */}
-            <div>
-              <label>Username : </label>
-              <input
-                type="text"
-                name="username"
-                placeholder={"Enter Username"}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-
-            {/* for Email */}
-            <div>
-              <label>Email : </label>
-              <input
-                type="email"
-                name="email"
-                placeholder={"Enter Email"}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            {/* for Password */}
-            <div>
-              <label>Password : </label>
-              <input
-                type="password"
-                name="password"
-                placeholder={"Enter Password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            {/* submit and switch to login buttons */}
-
-            {/* login */}
-            <a>
-              <Link to="/login">Have an account? LogIn</Link>
-            </a>
-
-            {/* signup */}
-            <button className={"btn btn-success"} type="submit">
-              SignUp
-            </button>
-          </form>
-        </div>
+    <div className={"card"} id={styles.card}>
+      <div className={"card-body"}>
+        <h2 id={styles.h2}>SignUp</h2>
+        <hr />
+        <form onSubmit={handleSignup}>
+          <div>
+            <label>Username:</label>
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter Username" />
+          </div>
+          <div>
+            <label>Email:</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter Email" />
+          </div>
+          <div>
+            <label>Password:</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter Password" />
+          </div>
+          <div>
+            <label>Gender:</label>
+            <select value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Date of Birth:</label>
+            <input type="date" value={birth_date} onChange={(e) => setBirth_date(e.target.value)} />
+          </div>
+          <div>
+            <label>Address:</label>
+            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter Address" />
+          </div>
+          <div>
+            <label>Phone number:</label>
+            <input type="tel" value={phone_number} onChange={(e) => setPhone_number(e.target.value)} placeholder="Enter Phone Number" />
+          </div>
+          <div>
+            <label>CCCD:</label>
+            <input type="text" value={citizen_id} onChange={(e) => setCitizen_id(e.target.value)} placeholder="Enter citizen id" />
+          </div>
+          <a><Link to="/login">Have an account? LogIn</Link></a>
+          <button className={"btn btn-success"} type="submit">SignUp</button>
+        </form>
       </div>
-    </>
+    </div>
   );
 }
 
-//exporting the created signup function to be used as a route in the app.jsx file
 export default SignupPage;

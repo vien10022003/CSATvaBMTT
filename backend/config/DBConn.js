@@ -26,11 +26,16 @@ const DBConn = async () => {
 
     //async await create tables in database if not exists query
     await pool.query(
-      `CREATE TABLE IF NOT EXISTS \`${process.env.DB_TABLENAME}\` (
+        `CREATE TABLE IF NOT EXISTS \`${process.env.DB_TABLENAME}\` (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
-            email VARCHAR(100) NOT NULL UNIQUE,
+            email TEXT NOT NULL,
             password VARCHAR(255) NOT NULL,
+            gender TEXT NOT NULL,
+            birth_date TEXT NOT NULL,
+            address TEXT NOT NULL,
+            phone_number TEXT NOT NULL,
+            citizen_id TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`
     );

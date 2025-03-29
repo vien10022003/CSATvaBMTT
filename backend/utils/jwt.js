@@ -1,30 +1,41 @@
-//importing json web token to create a token function to be used during login attempt
+// Importing jsonwebtoken to create and verify tokens
 const jwt = require("jsonwebtoken");
 
-//main token function that will be sending the token with some information init
+// Main token function that will be sending the token with some information
 const token = (foundUser, response) => {
-    //creating a jwt with the user's id, username, email and environmental variables
   const jwtToken = jwt.sign(
-    {
-      id: foundUser.id,
-      username: foundUser.username,
-      email: foundUser.email
-    },
+    { id: foundUser.id, username: foundUser.username },
     process.env.JWT_SECRET,
     {
       expiresIn: "30d"
     }
   );
 
-  // set the token as a cookie in the response headers
+  // Set the token as a cookie in the response headers
   response.cookie("token", jwtToken, {
-    httpOnly: true, // this prevents client-side JavaScript from accessing the cookie
-    maxAge: 30 * 24 * 60 * 60 * 1000, // ensures the cookie expires in 30 days
+    httpOnly: true, 
+    maxAge: 30 * 24 * 60 * 60 * 1000, 
   });
 
-  //sending the generated cookiee back to the client
-  return response.status(200).json({ msg: "token received" });
+  return response.status(200).json({ token: jwtToken });
 };
 
-//exporting the created token
-module.exports = token;
+// Middleware to verify JWT token
+const verifyToken = (req, res) => {
+  const token = req.headers["authorization"];
+
+  console.log(req.headers);
+  if (!token) {
+    return res.status(401).json({ message: "Access Denied. No token provided." });
+  }
+  console.log("token "+ token);
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded;
+  } catch (error) {
+    return res.status(403).json({ message: "Invalid or expired token." });
+  }
+};
+
+module.exports = { token, verifyToken };
