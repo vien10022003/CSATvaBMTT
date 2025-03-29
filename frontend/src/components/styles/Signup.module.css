@@ -8,9 +8,9 @@ body {
   background-size: cover;
 }
 #card {
-  width: 29rem !important;
+  width: 40rem !important;
   color: white;
-  height: 26.5rem !important;
+  height: 46rem !important;
   align-items: center;
   padding: 1rem;
   background-color: rgb(71, 97, 96);
@@ -47,4 +47,18 @@ input {
 #card a:hover {
   cursor: pointer;
   color: gainsboro;
+}
+
+.formContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.leftColumn, .rightColumn {
+  width: 48%;
+}
+
+.lable {
+  margin: 16px 16px 0px 24px;
 }
