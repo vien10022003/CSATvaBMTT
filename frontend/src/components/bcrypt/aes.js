@@ -1,7 +1,7 @@
 // link: https://www.kavaliro.com/wp-content/uploads/2014/03/AES.pdf
 // for debugging: https://www.cryptool.org/en/cto/aes-step-by-step
 
-class AES {
+export class Aes {
   constructor(secretKey = "this is a public key") {
     this.secretKey = secretKey;
   }
@@ -461,14 +461,14 @@ class AES {
   }
 
   // Hàm mã hóa dữ liệu
-  encrypt(data, secretKeyAes) {
+  encrypt(data, secretKey) {
     // Lấy secret key từ biến môi trường hoặc sử dụng mặc định
-    if (!secretKeyAes) {
-      secretKeyAes = this.secretKey;
+    if (!secretKey) {
+      secretKey = this.secretKey;
     }
 
     // Khởi tạo khóa
-    this.initKey(secretKeyAes);
+    this.initKey(secretKey);
 
     // Khởi tạo initial vector
     this.intiInitialVector("iv");
@@ -489,14 +489,14 @@ class AES {
   }
 
   // Hàm giải mã dữ liệu
-  decrypt(cipherText, secretKeyAes) {
+  decrypt(cipherText, secretKey) {
     // Lấy secret key từ biến môi trường hoặc sử dụng mặc định
-    if (!secretKeyAes) {
-      secretKeyAes = this.secretKey;
+    if (!secretKey) {
+      secretKey = this.secretKey;
     }
 
     // Khởi tạo khóa
-    this.initKey(secretKeyAes);
+    this.initKey(secretKey);
 
     // Khởi tạo initial vector
     this.intiInitialVector("iv");
@@ -542,6 +542,33 @@ class AES {
 
     return plainText;
   }
-}
 
-module.exports = new AES();
+  
+  encryptUser = (user, aesKey) => {
+    return {
+      ...user, // Giữ nguyên các thuộc tính không cần mã hóa
+      username: this.encrypt(user.username, aesKey),
+      password: this.encrypt(user.password, aesKey),
+      email: this.encrypt(user.email, aesKey),
+      gender: this.encrypt(user.gender, aesKey),
+      birth_date: this.encrypt(user.birth_date, aesKey),
+      address: this.encrypt(user.address, aesKey),
+      phone_number: this.encrypt(user.phone_number, aesKey),
+      citizen_id: this.encrypt(user.citizen_id, aesKey),
+    };
+  };
+
+  decryptUser = (user, aesKey) => {
+    return {
+      ...user, // Giữ nguyên các thuộc tính không cần mã hóa
+      username: this.decrypt(user.username, aesKey),
+      password: this.decrypt(user.password, aesKey),
+      email: this.decrypt(user.email, aesKey),
+      gender: this.decrypt(user.gender, aesKey),
+      birth_date: this.decrypt(user.birth_date, aesKey),
+      address: this.decrypt(user.address, aesKey),
+      phone_number: this.decrypt(user.phone_number, aesKey),
+      citizen_id: this.decrypt(user.citizen_id, aesKey),
+    };
+  };
+}

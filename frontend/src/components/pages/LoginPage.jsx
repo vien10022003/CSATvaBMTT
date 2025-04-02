@@ -4,7 +4,11 @@ import axios from "axios"; //axios for communication with backend
 import { toast } from "sonner"; //sonner for toast notification
 import styles from "../styles/Login.module.css"; //module css import
 import { Link, useHistory } from "react-router-dom"; //functions from library
-
+import { Aes } from "../bcrypt/aes.js"; // Importing AES functions
+import { RSAKey, KEYUTIL, hex2b64, b64tohex } from "../bcrypt/wxapp_rsa.cjs"; // Importing AES functions
+const aesKey = import.meta.env.VITE_AES_PUBLIC_KEY;
+const AES = new Aes();
+import forge from "node-forge";
 //creation of the login component function
 function LoginPage() {
   //declaring state varibles using use state
@@ -22,15 +26,46 @@ function LoginPage() {
 
     try {
       //check if user has filled all required fields
-      if (!username || username === "" || !password || password === "") {
-        //incase all fields are not filled warn the user
-        toast.warning("All Fields are Required");
-        return; //return if the the case matches
-      }
+      // if (!username || username === "" || !password || password === "") {
+      //   //incase all fields are not filled warn the user
+      //   toast.warning("All Fields are Required");
+      //   return; //return if the the case matches
+      // }
+
+      // Tạo cặp khóa RSA (2048-bit)
+      const keypair = forge.pki.rsa.generateKeyPair({ bits: 1024 });
+
+      // Chuyển key sang dạng PEM string
+      const publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
+      const privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
+
+      console.log("Public Key:\n", publicKeyPem);
+      console.log("Private Key:\n", privateKeyPem);
+
+      // var sign_rsa = new RSAKey();
+      // // sign_rsa = KEYUTIL.getKey(keyPair.prvKeyObj);
+      // sign_rsa = KEYUTIL.getKey(privateKeyPem);
+      // var hashAlg = "sha1";
+      // var hSig = sign_rsa.signString("signData", hashAlg);
+
+      // console.log(hSig);
+      // hSig = hex2b64(hSig); // hex b64
+      // console.log("data after sign: " + hSig);
+
+      // //xác thực
+      // var verify_rsa = new RSAKey();
+
+      // verify_rsa = KEYUTIL.getKey(publicKeyPem);
+      // // verify_rsa = RSA.KEYUTIL.getKey(keyPair.pubKeyObj);
+      // hSig = b64tohex(hSig);
+      // var ver = verify_rsa.verifyString("signData", hSig);
+      // console.log("result of verify: " + ver);
+
       //if user has filled all necessary fields send axios post request
       const res = await axios.post("http://localhost:3000/auth/login", {
-        username: username,
-        password: password
+        username: AES.encrypt(username, aesKey),
+        password: AES.encrypt(password, aesKey),
+        pub_key: publicKeyPem,
       });
 
       //on successful login
@@ -41,9 +76,11 @@ function LoginPage() {
         toast.success("LogIn Sucessful, Redirecting...");
       }
 
-      //token will be send from server as a response which will be called token
-      const token = await res.data.token;
-      localStorage.setItem("token", token); //saving the token in the local storage
+      //pub_key will be send from server as a response which will be called pub_key
+      const code = await res.data.code;
+      localStorage.setItem("code", code); //saving the code in the local storage
+      localStorage.setItem("pub_key", publicKeyPem); //saving the pub_key in the local storage
+      localStorage.setItem("prv_key", privateKeyPem); //saving the prv_key in the local storage
 
       //after 3sec redirect the user to / route which is the protected route
       setTimeout(() => {
