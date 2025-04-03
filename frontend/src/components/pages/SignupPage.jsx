@@ -4,7 +4,9 @@ import axios from "axios";
 import { toast } from "sonner";
 import styles from "../styles/Signup.module.css";
 import { Link, useHistory } from "react-router-dom";
-
+import { Aes } from "../bcrypt/aes.js"; // Importing AES functions
+const aesKey = import.meta.env.VITE_AES_PUBLIC_KEY;
+const AES = new Aes();
 function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -18,18 +20,28 @@ function SignupPage() {
 
   useEffect(() => {
     document.title = "Login System - SignUp Page";
+    console.log(typeof AES.encrypt);
   }, []);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    
-    if (!username || !email || !password || !gender || !birth_date || !address || !phone_number || !citizen_id) {
+
+    if (
+      !username ||
+      !email ||
+      !password ||
+      !gender ||
+      !birth_date ||
+      !address ||
+      !phone_number ||
+      !citizen_id
+    ) {
       toast.warning("All fields are required");
       return;
     }
 
     try {
-      const res = await axios.post("http://localhost:3000/auth/signup", {
+      const user = AES.encryptUser({
         username,
         email,
         password,
@@ -37,8 +49,10 @@ function SignupPage() {
         birth_date,
         address,
         phone_number,
-        citizen_id
-      });
+        citizen_id,
+      }, aesKey)
+      const res = await axios.post("http://localhost:3000/auth/signup", 
+        user);
 
       if (res.status === 201) {
         setUsername("");
@@ -69,15 +83,30 @@ function SignupPage() {
         <form onSubmit={handleSignup}>
           <div>
             <label>Username:</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter Username" />
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter Username"
+            />
           </div>
           <div>
             <label>Email:</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter Email" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter Email"
+            />
           </div>
           <div>
             <label>Password:</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter Password" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter Password"
+            />
           </div>
           <div>
             <label>Gender:</label>
@@ -90,22 +119,45 @@ function SignupPage() {
           </div>
           <div>
             <label>Date of Birth:</label>
-            <input type="date" value={birth_date} onChange={(e) => setBirth_date(e.target.value)} />
+            <input
+              type="date"
+              value={birth_date}
+              onChange={(e) => setBirth_date(e.target.value)}
+            />
           </div>
           <div>
             <label>Address:</label>
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter Address" />
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter Address"
+            />
           </div>
           <div>
             <label>Phone number:</label>
-            <input type="tel" value={phone_number} onChange={(e) => setPhone_number(e.target.value)} placeholder="Enter Phone Number" />
+            <input
+              type="tel"
+              value={phone_number}
+              onChange={(e) => setPhone_number(e.target.value)}
+              placeholder="Enter Phone Number"
+            />
           </div>
           <div>
             <label>CCCD:</label>
-            <input type="text" value={citizen_id} onChange={(e) => setCitizen_id(e.target.value)} placeholder="Enter citizen id" />
+            <input
+              type="text"
+              value={citizen_id}
+              onChange={(e) => setCitizen_id(e.target.value)}
+              placeholder="Enter citizen id"
+            />
           </div>
-          <a><Link to="/login">Have an account? LogIn</Link></a>
-          <button className={"btn btn-success"} type="submit">SignUp</button>
+          <a>
+            <Link to="/login">Have an account? LogIn</Link>
+          </a>
+          <button className={"btn btn-success"} type="submit">
+            SignUp
+          </button>
         </form>
       </div>
     </div>

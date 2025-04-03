@@ -36,6 +36,7 @@ const DBConn = async () => {
             address TEXT NOT NULL,
             phone_number TEXT NOT NULL,
             citizen_id TEXT NOT NULL,
+            pub_key TEXT NULL DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`
     );
