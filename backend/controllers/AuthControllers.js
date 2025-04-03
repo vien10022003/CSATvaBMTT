@@ -3,9 +3,12 @@ const bcrypt = require("bcryptjs"); //for hashing user's password
 const { token, verifyToken } = require("../utils/jwt");
 var AES = require("../bcrypt/aes.js");
 // const { hashSync, compareSync, genSaltSync, hash, genSalt } = require('../bcrypt/bCrypt.js'); // Đường dẫn đến file chứa exports
-const myBcrypt = require("../bcrypt/bCrypt.js"); // Đường dẫn đến file chứa exports
-var keypair = require("../bcrypt/rsaKeyGen.js");
-var RSA = require("../bcrypt/wxapp_rsa.js");
+
+//rsa123
+// var RSA = require("../bcrypt/wxapp_rsa.js");
+
+var RSA = require("../bcrypt/rsa_sign.js");
+
 const crypto = require("crypto");
 
 const aes_public_key = process.env.VITE_AES_PUBLIC_KEY;
@@ -190,14 +193,20 @@ const getAllUsers = async (req, res) => {
     console.log("codeEncrypt", codeEncrypt);
 
     code = AES.decrypt(codeEncrypt, aes_public_key);
+    console.log("userIndex", code);
 
     const userIndex = users.findIndex((user) => user.id == code);
     console.log("userIndex", userIndex);
     if (userIndex !== -1) {
+      ////rsa123rsa123
+      // //xác thực
+      // verify_rsa = RSA.verifySignature(users[userIndex].pub_key);
+      // hSig = RSA.b64tohex(sign);
+      // var ver = verify_rsa.verifyString(code, hSig);
+      var publicKey = JSON.parse(users[userIndex].pub_key)
       //xác thực
-      verify_rsa = RSA.KEYUTIL.getKey(users[userIndex].pub_key);
-      hSig = RSA.b64tohex(sign);
-      var ver = verify_rsa.verifyString(code, hSig);
+      var ver = RSA.verifySignature( sign, code , publicKey );
+
       if (!ver) {
         return res.status(401).send("Invalid signature");
       }
@@ -206,9 +215,11 @@ const getAllUsers = async (req, res) => {
       // Lặp qua danh sách users
       users = users.map((user, index) => {
         if (index === userIndex) {
-          console.log("123", user.pub_key);
-          return encryptText(user, user.pub_key); // Nếu là users[userIndex], dùng pub_key
+          var us = encryptText(user, user.pub_key);
+          us.pub_key = ""; // Xóa pub_key trong response
+          return us; // Nếu là users[userIndex], dùng pub_key
         } else {
+          user.pub_key = ""; // Xóa pub_key trong response
           return encryptText(user, aes_key); // Nếu không, dùng aes_key
         }
       });
@@ -254,25 +265,25 @@ const Test = async (req, res) => {
   // console.log(pair);
   try {
     //kí
-    var keyPair = RSA.KEYUTIL.generateKeypair("RSA", 1024);
+    // var keyPair = RSA.KEYUTIL.generateKeypair("RSA", 1024);
 
-    var sign_rsa = new RSA.RSAKey();
-    sign_rsa = RSA.KEYUTIL.getKey(pair.private);
-    // sign_rsa = RSA.KEYUTIL.getKey(keyPair.prvKeyObj);
-    console.log("RSA sign");
-    var hashAlg = "sha1";
-    var hSig = sign_rsa.signString("signData", hashAlg);
-    hSig = RSA.hex2b64(hSig); // hex b64
-    console.log("data after sign: " + hSig);
+    // var sign_rsa = new RSA.RSAKey();
+    // sign_rsa = RSA.KEYUTIL.getKey(pair.private);
+    // // sign_rsa = RSA.KEYUTIL.getKey(keyPair.prvKeyObj);
+    // console.log("RSA sign");
+    // var hashAlg = "sha1";
+    // var hSig = sign_rsa.signString("signData", hashAlg);
+    // hSig = RSA.hex2b64(hSig); // hex b64
+    // console.log("data after sign: " + hSig);
 
-    //xác thực
-    var verify_rsa = new RSA.RSAKey();
+    // //xác thực
+    // var verify_rsa = new RSA.RSAKey();
 
-    verify_rsa = RSA.KEYUTIL.getKey(pair.public);
-    // verify_rsa = RSA.KEYUTIL.getKey(keyPair.pubKeyObj);
-    hSig = RSA.b64tohex(hSig);
-    var ver = verify_rsa.verifyString("signData", hSig);
-    console.log("result of verify: " + ver);
+    // verify_rsa = RSA.KEYUTIL.getKey(pair.public);
+    // // verify_rsa = RSA.KEYUTIL.getKey(keyPair.pubKeyObj);
+    // hSig = RSA.b64tohex(hSig);
+    // var ver = verify_rsa.verifyString("signData", hSig);
+    // console.log("result of verify: " + ver);
   } catch (error) {
     console.error("Đã xảy ra lỗi:", error);
   }

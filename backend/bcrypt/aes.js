@@ -27,7 +27,7 @@ class AES {
         let hex = hexString.slice(i, i + 2); // Lấy 2 ký tự liên tiếp
         bytes.push(parseInt(hex, 16)); // Chuyển từ hex sang số nguyên
     }
-    console.log(bytes);
+    // console.log(bytes);
     return bytes;
   }
 
@@ -37,7 +37,7 @@ class AES {
         let hex = hexString.slice(i, i + 2); // Lấy 2 ký tự liên tiếp
         bytes.push(hex); // Chuyển từ hex sang số nguyên
     }
-    console.log(bytes);
+    // console.log(bytes);
     return bytes;
   }
 
@@ -371,30 +371,6 @@ class AES {
     return block;
   }
 
-  // Hàm khởi tạo initial Vector từ plain text
-  intiInitialVector(initialVectorText) {
-    // convert sang hex text
-    const hexString = this.textToHex(initialVectorText);
-
-    // convert sang mảng byte
-    let bytes = this.hexStringToBytes(hexString);
-
-    // Nếu initial vector dài hơn 16 byte thì cắt bớt, ngược lại thêm 0 vào cuối
-    if (bytes.length > 16) {
-      bytes = bytes.slice(0, 16);
-    } else if (bytes.length < 16) {
-      bytes = bytes.concat(new Array(16 - bytes.length).fill(0));
-    }
-
-    // Kiểm tra initial vector có đúng 16 byte không
-    if (bytes.length !== 16) {
-      throw new Error("Invalid initial vector");
-    }
-
-    // Chuyển sang mảng 2 chiều
-    this.initialVector = this.convertToTwoDimensionalArray(bytes);
-  }
-
   // Hàm thực hiện phép XOR cho 2 mảng 2 chiều
   xorArrays2D(array1, array2) {
     if (
@@ -434,7 +410,7 @@ class AES {
     state = this.addRoundKey(state, 10);
 
     // XOR với initial vector để tăng độ bảo mật
-    state = this.xorArrays2D(this.initialVector, state);
+    // state = this.xorArrays2D(this.initialVector, state);
 
     return state;
   }
@@ -442,7 +418,7 @@ class AES {
   // Hàm thực hiện phép giải mã cho một block dữ liệu 128 bit
   decryptStateBlock(state) {
     // XOR với initial vector trước ( theo thuật toán mã hóa )
-    state = this.xorArrays2D(this.initialVector, state);
+    // state = this.xorArrays2D(this.initialVector, state);
 
     state = this.addRoundKey(state, 10);
 
@@ -471,7 +447,6 @@ class AES {
     this.initKey(secretKeyAes);
 
     // Khởi tạo initial vector
-    this.intiInitialVector("iv");
 
     // Tách dữ liệu thành các block nhỏ 128 bit
     const stateBlocks = this.separateIntoStateBlocks(data);
@@ -499,7 +474,6 @@ class AES {
     this.initKey(secretKeyAes);
 
     // Khởi tạo initial vector
-    this.intiInitialVector("iv");
 
     const array = this.hexStringToArray(cipherText);
 

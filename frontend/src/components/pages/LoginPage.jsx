@@ -5,10 +5,17 @@ import { toast } from "sonner"; //sonner for toast notification
 import styles from "../styles/Login.module.css"; //module css import
 import { Link, useHistory } from "react-router-dom"; //functions from library
 import { Aes } from "../bcrypt/aes.js"; // Importing AES functions
-import { RSAKey, KEYUTIL, hex2b64, b64tohex } from "../bcrypt/wxapp_rsa.cjs"; // Importing AES functions
-const aesKey = import.meta.env.VITE_AES_PUBLIC_KEY;
 const AES = new Aes();
+const aesKey = import.meta.env.VITE_AES_PUBLIC_KEY;
 import forge from "node-forge";
+import {
+  generatePrivateKey,
+  generatePublicKey,
+  signMessage,
+  verifySignature,
+  extractNumberFromString,
+} from "../bcrypt/rsa_sign.js";
+
 //creation of the login component function
 function LoginPage() {
   //declaring state varibles using use state
@@ -32,34 +39,24 @@ function LoginPage() {
       //   return; //return if the the case matches
       // }
 
-      // Tạo cặp khóa RSA (2048-bit)
-      const keypair = forge.pki.rsa.generateKeyPair({ bits: 1024 });
+      // //rsa123
+      // // Tạo cặp khóa RSA (2048-bit)
+      // const keypair = forge.pki.rsa.generateKeyPair({ bits: 1024 });
 
-      // Chuyển key sang dạng PEM string
-      const publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
-      const privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
+      // // Chuyển key sang dạng PEM string
+      // const publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
+      // const privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
 
-      console.log("Public Key:\n", publicKeyPem);
-      console.log("Private Key:\n", privateKeyPem);
+      // console.log("Public Key:\n", publicKeyPem);
+      // console.log("Private Key:\n", privateKeyPem);
 
-      // var sign_rsa = new RSAKey();
-      // // sign_rsa = KEYUTIL.getKey(keyPair.prvKeyObj);
-      // sign_rsa = KEYUTIL.getKey(privateKeyPem);
-      // var hashAlg = "sha1";
-      // var hSig = sign_rsa.signString("signData", hashAlg);
+      const privateKey = generatePrivateKey();
+      const publicKey = generatePublicKey(privateKey);
 
-      // console.log(hSig);
-      // hSig = hex2b64(hSig); // hex b64
-      // console.log("data after sign: " + hSig);
 
-      // //xác thực
-      // var verify_rsa = new RSAKey();
-
-      // verify_rsa = KEYUTIL.getKey(publicKeyPem);
-      // // verify_rsa = RSA.KEYUTIL.getKey(keyPair.pubKeyObj);
-      // hSig = b64tohex(hSig);
-      // var ver = verify_rsa.verifyString("signData", hSig);
-      // console.log("result of verify: " + ver);
+      // Chuyển object thành chuỗi JSON để lưu
+      var privateKeyPem = JSON.stringify(privateKey);
+      var publicKeyPem = JSON.stringify(publicKey);
 
       //if user has filled all necessary fields send axios post request
       const res = await axios.post("http://localhost:3000/auth/login", {

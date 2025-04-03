@@ -20,7 +20,6 @@ function SignupPage() {
 
   useEffect(() => {
     document.title = "Login System - SignUp Page";
-    console.log(typeof AES.encrypt);
   }, []);
 
   const handleSignup = async (e) => {
